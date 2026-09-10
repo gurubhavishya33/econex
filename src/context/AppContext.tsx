@@ -44,6 +44,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [pickups, setPickups] = useState<Pickup[]>(samplePickups);
   const [notifications, setNotifications] = useState<Notification[]>(sampleNotifications);
   const [toasts, setToasts] = useState<Toast[]>([]);
+  
+
 
   const addToast = useCallback((message: string, type: Toast['type'] = 'success') => {
     const id = `t${Date.now()}`;
@@ -58,12 +60,41 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = useCallback((email: string, role: UserRole) => {
-    const user = users.find((u) => u.email === email) || users.find((u) => u.role === role);
-    if (user) {
-      setCurrentUser(user);
-      addToast(`Welcome back, ${user.name}!`, 'success');
-    }
-  }, [users, addToast]);
+  const existingUser = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
+
+  if (existingUser) {
+    setCurrentUser(existingUser);
+    addToast(`Welcome back, ${existingUser.name}!`, 'success');
+    return;
+  }
+
+  // Create a demo user from the entered email
+  const username = email.split('@')[0];
+  const formattedName = username
+    .replace(/[._-]+/g, ' ')
+    .replace(/\d+/g, '')
+    .trim()
+    .replace(/\b\w/g, (char) => char.toUpperCase()) || 'EcoNex User';
+
+  const newUser: User = {
+    id: `u${Date.now()}`,
+    name: formattedName,
+    email,
+    phone: '',
+    location: '',
+    role,
+    rewardPoints: role === 'citizen' ? 0 : undefined,
+    joinedDate: new Date().toISOString().split('T')[0],
+    status: 'active',
+    totalPickups: 0,
+    completedPickups: 0,
+    earnings: role === 'kabadiwala' ? 0 : undefined,
+  };
+
+  setUsers((prev) => [...prev, newUser]);
+  setCurrentUser(newUser);
+  addToast(`Welcome to EcoNex, ${newUser.name}!`, 'success');
+}, [users, addToast]);
 
   const logout = useCallback(() => {
     setCurrentUser(null);
