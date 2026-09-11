@@ -122,7 +122,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [addToast]);
 
   const createPickup = useCallback((pickupData: Omit<Pickup, 'id' | 'status' | 'rewardPoints' | 'co2Saved' | 'createdAt'>) => {
-    const id = `PKP-2025-${String(pickupCounter++).padStart(3, '0')}`;
+    const id = `PKP-2026-${String(pickupCounter++).padStart(3, '0')}`;
     const rewardPoints = wasteTypeToPoints[pickupData.wasteType] || 40;
     const co2Saved = Number(((wasteTypeToCO2[pickupData.wasteType] || 1) * pickupData.estimatedWeight).toFixed(1));
     const newPickup: Pickup = {
